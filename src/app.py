@@ -71,9 +71,14 @@ def command_from_to(*locations):
         'FromStationCode': from_station_code,
         'ToStationCode': to_station_code,
     })
-    endpoint = "/Rail.svc/json/jPath?%s" % params
+    endpoint = f"/Rail.svc/json/jSrcStationToDstStationInfo?{params}"
     data = make_wmata_request(endpoint)
-    print(data)
+    organize_from_to(data, from_location, to_location)
+
+def organize_from_to(data, from_location, to_location):
+    info = data["StationToStationInfos"][0]
+    rail_time = info["RailTime"]
+    print(f"The estimated rail time from {from_location} to {to_location} is {rail_time}")
 
 
 def get_station_code(location, error_message):
@@ -86,7 +91,6 @@ def get_station_code(location, error_message):
 
 
 def make_wmata_request(endpoint):
-    params = urllib.parse.urlencode({})
     try:
         conn = http.client.HTTPSConnection('api.wmata.com')
         conn.request("GET", f"{endpoint}", "{body}", headers)
@@ -96,7 +100,8 @@ def make_wmata_request(endpoint):
         conn.close()
         return data
     except Exception as e:
-        print("[Errno {0}] {1}".format(e.errno, e.strerror))
+        print(e)
+        # print("[Errno {0}] {1}".format(e.errno, e.strerror))
 
 
 def process_input():
@@ -111,8 +116,10 @@ def process_input():
             handle_commands(command, args)
             # print(inputs[0])
             # print(inputs[1])
-    except:
+    except KeyboardInterrupt:
         print("\nExecution interrupted by the user.")
+    except Exception as e:
+        print(e)
 
 
 headers = {
