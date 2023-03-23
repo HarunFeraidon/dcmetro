@@ -5,3 +5,6 @@
 !when <color> <station>
 
 !howto <from station> <to station>
+
+change the output from when to be "for <color> line, the next arrivals are..." by default
+or by the train destination with an extra input
