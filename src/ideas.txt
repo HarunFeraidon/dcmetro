@@ -1,0 +1,7 @@
+!help information on commands
+
+!schedule <station>
+
+!when <color> <station>
+
+!howto <from station> <to station>
