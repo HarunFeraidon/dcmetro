@@ -6,8 +6,11 @@ import json
 
 load_dotenv(find_dotenv())
 API_KEY = os.environ.get("API_KEY")
-print(API_KEY)
 
+headers = {
+    # Request headers
+    'api_key': API_KEY,
+}
 
 def handle_commands(command, args):
     commands = {
@@ -15,20 +18,21 @@ def handle_commands(command, args):
         'from': command_from_to,
     }
     if command in commands:
-        commands[command](*args)
+        return commands[command](*args)
     else:
-        print("command not recognized")
-
+        error = f"command not found: {command}"
+        print(error)
+        return error
 
 def command_when(*locations):
     location = " ".join(locations)
-    print("You want to know when", location, "is.")
     station_code = get_station_code(location, "Location not recognized")
 
     params = urllib.parse.urlencode({})
     endpoint =  f"/StationPrediction.svc/json/GetPrediction/{station_code}?{params}"
     data = make_wmata_request(endpoint)
-    organize_for_when(data)
+    arrivals = organize_for_when(data)
+    return arrivals
 
 
 def organize_for_when(data):
@@ -43,6 +47,7 @@ def organize_for_when(data):
         print(
             f"For {platform}, the next arrivals are in {', '.join(arrivals[platform])} minutes"
         )
+    return arrivals
 
 
 def command_from_to(*locations):
@@ -73,12 +78,14 @@ def command_from_to(*locations):
     })
     endpoint = f"/Rail.svc/json/jSrcStationToDstStationInfo?{params}"
     data = make_wmata_request(endpoint)
-    organize_from_to(data, from_location, to_location)
+    rail_time = organize_from_to(data, from_location, to_location)
+    return rail_time
 
 def organize_from_to(data, from_location, to_location):
     info = data["StationToStationInfos"][0]
     rail_time = info["RailTime"]
     print(f"The estimated rail time from {from_location} to {to_location} is {rail_time}")
+    return rail_time
 
 
 def get_station_code(location, error_message):
@@ -87,7 +94,7 @@ def get_station_code(location, error_message):
         # print("Location name: {} Code: {}".format(location, constants.STATION_CODES[location]))
     else:
         print(error_message)
-        return
+        return error_message
 
 
 def make_wmata_request(endpoint):
@@ -120,29 +127,6 @@ def process_input():
         print("\nExecution interrupted by the user.")
     except Exception as e:
         print(e)
-
-
-headers = {
-    # Request headers
-    'api_key': API_KEY,
-}
-
-params = urllib.parse.urlencode({})
-
-
-def station_prediction():
-    try:
-        conn = http.client.HTTPSConnection('api.wmata.com')
-        conn.request(
-            "GET",
-            "/StationPrediction.svc/json/GetPrediction/{StationCodes}?%s" %
-            params, "{body}", headers)
-        response = conn.getresponse()
-        data = response.read()
-        print(data)
-        conn.close()
-    except Exception as e:
-        print("[Errno {0}] {1}".format(e.errno, e.strerror))
 
 
 if __name__ == '__main__':

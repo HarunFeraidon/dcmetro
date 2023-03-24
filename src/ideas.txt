@@ -5,6 +5,11 @@
 !when <color> <station>
 
 !howto <from station> <to station>
+    will have to implement pathfinding
+    get lists of routes of each color
+    create a graph where the edges have a weight of distance and get intersections by finding locations that have multiple colors
+        changing lines should also have some factor, otherwise there may be multiple shortest paths where you change colors 
+        (silver and orange line have a lot in common for example)
 
 change the output from when to be "for <color> line, the next arrivals are..." by default
 or by the train destination with an extra input
