@@ -1,7 +1,8 @@
 import http.client, urllib.request, urllib.parse, urllib.error, base64
 import os
 from dotenv import load_dotenv, find_dotenv
-import constants
+from main import constants
+# import constants
 import json
 
 load_dotenv(find_dotenv())
@@ -12,6 +13,7 @@ headers = {
     'api_key': API_KEY,
 }
 
+
 def handle_commands(command, args):
     commands = {
         'when': command_when,
@@ -21,16 +23,21 @@ def handle_commands(command, args):
         return commands[command](*args)
     else:
         error = f"command not found: {command}"
-        print(error)
         return error
+
 
 def command_when(*locations):
     location = " ".join(locations)
-    station_code = get_station_code(location, "Location not recognized")
+    error_message = "Location not recognized"
+    station_code = get_station_code(location, error_message)
+    if station_code == error_message:
+        return error_message
 
     params = urllib.parse.urlencode({})
-    endpoint =  f"/StationPrediction.svc/json/GetPrediction/{station_code}?{params}"
+    endpoint = f"/StationPrediction.svc/json/GetPrediction/{station_code}?{params}"
     data = make_wmata_request(endpoint)
+    if(connection_broken(data)):
+        return constants.ERROR_CONN
     arrivals = organize_for_when(data)
     return arrivals
 
@@ -39,6 +46,8 @@ def organize_for_when(data):
     arrivals = {}
     results = data["Trains"]
     for result in results:
+        if(result["DestinationCode"] == None or result["Min"] == '' or result["Car"] == None):
+            continue
         minute = result["Min"]
         destination = result["Destination"]
         arrivals.setdefault(destination, [])
@@ -63,14 +72,17 @@ def command_from_to(*locations):
         else:
             after_to.append(loc)
     if not found_to:
-        print("Error: please follow a 'from' start 'to' end format")
-        return
+        return "Error: please follow a 'from' start 'to' end format"
     from_location = " ".join(before_to)
     to_location = " ".join(after_to)
-    from_station_code = get_station_code(from_location,
-                                         "'From' location not recognized")
-    to_station_code = get_station_code(to_location,
-                                       "'To' location not recognized")
+    from_error = "'From' location not recognized"
+    to_error = "'To' location not recognized"
+    from_station_code = get_station_code(from_location, from_error)
+    if (from_station_code == from_error):
+        return from_error
+    to_station_code = get_station_code(to_location, to_error)
+    if (to_station_code == to_error):
+        return to_error
     params = urllib.parse.urlencode({
         # Request parameters
         'FromStationCode': from_station_code,
@@ -78,13 +90,18 @@ def command_from_to(*locations):
     })
     endpoint = f"/Rail.svc/json/jSrcStationToDstStationInfo?{params}"
     data = make_wmata_request(endpoint)
+    if(connection_broken(data)):
+        return constants.ERROR_CONN
     rail_time = organize_from_to(data, from_location, to_location)
     return rail_time
+
 
 def organize_from_to(data, from_location, to_location):
     info = data["StationToStationInfos"][0]
     rail_time = info["RailTime"]
-    print(f"The estimated rail time from {from_location} to {to_location} is {rail_time}")
+    print(
+        f"The estimated rail time from {from_location} to {to_location} is {rail_time}"
+    )
     return rail_time
 
 
@@ -93,7 +110,6 @@ def get_station_code(location, error_message):
         return constants.STATION_CODES[location]
         # print("Location name: {} Code: {}".format(location, constants.STATION_CODES[location]))
     else:
-        print(error_message)
         return error_message
 
 
@@ -105,10 +121,18 @@ def make_wmata_request(endpoint):
         data = response.read().decode('utf-8')
         data = json.loads(data)
         conn.close()
+        # print(data)
         return data
     except Exception as e:
-        print(e)
+        # print({constants.ERROR_CONN, str(e)})
+        return {constants.ERROR_CONN: str(e)}
         # print("[Errno {0}] {1}".format(e.errno, e.strerror))
+
+def connection_broken(data):
+    if constants.ERROR_CONN in data:
+        return True
+    return False
+    
 
 
 def process_input():
@@ -120,6 +144,8 @@ def process_input():
                 continue
             command = inputs[0]
             args = inputs[1:]
+            if len(args) == 0:
+                continue
             handle_commands(command, args)
             # print(inputs[0])
             # print(inputs[1])

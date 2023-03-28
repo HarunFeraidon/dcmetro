@@ -1,3 +1,5 @@
+ERROR_CONN = "Error, connection is broken"
+
 LINE_CODES = {
     'Red' : 'RD',
     'Yellow' : 'YL',
