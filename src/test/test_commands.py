@@ -1,11 +1,12 @@
 import unittest
-from unittest.mock import MagicMock
-from main import app
+from unittest.mock import patch
+from main import app, constants
 
 
 class TestCommands(unittest.TestCase):
 
-    def test_command_when_base(self):
+    @patch('main.app.make_wmata_request')
+    def test_command_when_base(self, mock_make_wmata_request):
         command = "when"
         location = ["McLean"]
         data = {
@@ -37,7 +38,7 @@ class TestCommands(unittest.TestCase):
             }]
         }
         results = {'Largo': ['6', '26'], 'Ashburn': ['BRD', '15', '32']}
-        app.make_wmata_request = MagicMock(return_value=data)
+        mock_make_wmata_request.return_value = data
         self.assertEqual(app.handle_commands(command, location), results)
 
         location = ["NoMa-Gallaudet", "U"]
@@ -70,23 +71,22 @@ class TestCommands(unittest.TestCase):
             }]
         }
         results = {'Largo': ['BRD'], 'Vienna': ['BRD']}
-        app.make_wmata_request = MagicMock(return_value=data)
+        mock_make_wmata_request.return_value = data
         self.assertEqual(app.handle_commands(command, location), results)
 
     def test_command_not_found(self):
-        # app.handle_commands("when", "McLean")
         command = "whn"
         result = f"command not found: {command}"
         self.assertEqual(app.handle_commands(command, "McLean"), result)
 
     def test_location_not_recognized(self):
-        # app.handle_commands("when", "McLean")
         command = "when"
         location = ["disneyland"]
         result = "Location not recognized"
         self.assertEqual(app.handle_commands(command, location), result)
 
-    def test_command_from_to_base(self):
+    @patch('main.app.make_wmata_request')
+    def test_command_from_to_base(self, mock_make_wmata_request):
         command = "from"
         location = ["McLean", "to", "Ashburn"]
         data = {
@@ -94,7 +94,7 @@ class TestCommands(unittest.TestCase):
                 'RailTime': 36,
             }]
         }
-        app.make_wmata_request = MagicMock(return_value=data)
+        mock_make_wmata_request.return_value = data
         self.assertEqual(app.handle_commands(command, location), 36)
 
         location = [
@@ -106,7 +106,7 @@ class TestCommands(unittest.TestCase):
                 'RailTime': 8,
             }]
         }
-        app.make_wmata_request = MagicMock(return_value=data)
+        mock_make_wmata_request.return_value = data
         self.assertEqual(app.handle_commands(command, location), 8)
 
     def test_command_from_to_without_to(self):
@@ -124,6 +124,14 @@ class TestCommands(unittest.TestCase):
         result = "'To' location not recognized"
         print(app.handle_commands(command, location))
         self.assertEqual(app.handle_commands(command, location), result)
+
+    def test_make_wmata_request(self):
+        sample_endpoint = "/StationPrediction.svc/json/GetPrediction/N01?"
+        bad_endpoint = "bad_endpoint"
+        result = app.make_wmata_request(sample_endpoint)
+        self.assertTrue(constants.ERROR_CONN not in result)
+        result = app.make_wmata_request(bad_endpoint)
+        self.assertTrue(constants.ERROR_CONN in result)
 
 
 if __name__ == '__main__':

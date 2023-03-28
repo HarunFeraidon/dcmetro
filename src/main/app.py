@@ -36,9 +36,9 @@ def command_when(*locations):
     params = urllib.parse.urlencode({})
     endpoint = f"/StationPrediction.svc/json/GetPrediction/{station_code}?{params}"
     data = make_wmata_request(endpoint)
-    print(data)
+    if(connection_broken(data)):
+        return constants.ERROR_CONN
     arrivals = organize_for_when(data)
-    print(arrivals)
     return arrivals
 
 
@@ -90,6 +90,8 @@ def command_from_to(*locations):
     })
     endpoint = f"/Rail.svc/json/jSrcStationToDstStationInfo?{params}"
     data = make_wmata_request(endpoint)
+    if(connection_broken(data)):
+        return constants.ERROR_CONN
     rail_time = organize_from_to(data, from_location, to_location)
     return rail_time
 
@@ -119,10 +121,18 @@ def make_wmata_request(endpoint):
         data = response.read().decode('utf-8')
         data = json.loads(data)
         conn.close()
+        # print(data)
         return data
     except Exception as e:
-        print(e)
+        # print({constants.ERROR_CONN, str(e)})
+        return {constants.ERROR_CONN: str(e)}
         # print("[Errno {0}] {1}".format(e.errno, e.strerror))
+
+def connection_broken(data):
+    if constants.ERROR_CONN in data:
+        return True
+    return False
+    
 
 
 def process_input():
