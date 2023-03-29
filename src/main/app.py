@@ -1,8 +1,8 @@
 import http.client, urllib.request, urllib.parse, urllib.error, base64
 import os
 from dotenv import load_dotenv, find_dotenv
-from main import constants
-# import constants
+# from main import constants
+import constants
 import json
 
 load_dotenv(find_dotenv())
