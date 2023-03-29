@@ -10,8 +10,6 @@ def get_each_lines_start_and_end_stations():
     lines = data["Lines"]
     for line in lines:
         result.setdefault(line["LineCode"], (line["StartStationCode"], line["EndStationCode"]))
-    # {'BL': ('J03', 'G05'), 'GR': ('F11', 'E10'), 'OR': ('K08', 'D13'),
-    # 'RD': ('A15', 'B11'), 'SV': ('N12', 'G05'), 'YL': ('C15', 'E06')}
     generate_all_lines_path(result)
     return result
 
@@ -28,13 +26,10 @@ def generate_all_lines_path(lines):
         each_stop = data["Path"]
         info = []
         for stop in each_stop:
-            info.append({stop["StationCode"]: stop["DistanceToPrev"]})
+            info.append([stop["StationCode"], stop["DistanceToPrev"]])
         lines_with_stops.setdefault(line, info)
     print(lines_with_stops)
     return lines_with_stops
-
-
-    
 
 if __name__ == '__main__':
     get_each_lines_start_and_end_stations()
