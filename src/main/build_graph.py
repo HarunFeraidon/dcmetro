@@ -1,3 +1,6 @@
+import os
+import pickle
+import heapq
 from constants import EACH_LINES_DISTANCE_TO_PREVIOUS_STATION_LIST
 
 class GraphNode:
@@ -42,4 +45,29 @@ def create_graph():
     for node_name, node in graph.nodes.items():
         print(f"{node_name}: {node.edges}")
     
+    with open('graph.pickle', 'wb') as f:
+        pickle.dump(graph, f)
+    
     return graph
+
+def load_graph():
+    # Load the graph from the file
+    if os.path.exists('graph.pickle'):
+        with open('graph.pickle', 'rb') as f:
+            graph = pickle.load(f)
+    else:
+        # Create the graph and save it to a file
+        graph = create_graph()
+        with open('graph.pickle', 'wb') as f:
+            pickle.dump(graph, f)
+
+    # Use the graph object
+    return graph
+
+def print_graph(graph):
+    for node_name, node in graph.nodes.items():
+        print(f"{node_name}: {node.edges}")
+
+if __name__ == "__main__":
+    graph = load_graph()
+    print(type(graph))
