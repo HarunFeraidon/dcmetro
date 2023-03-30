@@ -3,6 +3,8 @@ import os
 from dotenv import load_dotenv, find_dotenv
 # from main import constants
 import constants
+from dijkstra import dijkstra
+from build_graph import Graph, GraphNode
 import json
 
 load_dotenv(find_dotenv())
@@ -18,6 +20,7 @@ def handle_commands(command, args):
     commands = {
         'when': command_when,
         'from': command_from_to,
+        'path': command_path,
     }
     if command in commands:
         return commands[command](*args)
@@ -58,12 +61,10 @@ def organize_for_when(data):
         )
     return arrivals
 
-
-def command_from_to(*locations):
+def process_multi_word_locations(*locations):
     before_to = []
     after_to = []
     found_to = False
-
     for loc in locations:
         if loc.lower() == "to":
             found_to = True
@@ -75,6 +76,10 @@ def command_from_to(*locations):
         return "Error: please follow a 'from' start 'to' end format"
     from_location = " ".join(before_to)
     to_location = " ".join(after_to)
+    return from_location, to_location
+
+def command_from_to(*locations):
+    from_location, to_location = process_multi_word_locations(*locations)
     from_error = "'From' location not recognized"
     to_error = "'To' location not recognized"
     from_station_code = get_station_code(from_location, from_error)
@@ -104,6 +109,20 @@ def organize_from_to(data, from_location, to_location):
     )
     return rail_time
 
+def command_path(*locations):
+    from_location, to_location = process_multi_word_locations(*locations)
+    from_error = "'From' location not recognized"
+    to_error = "'To' location not recognized"
+    from_station_code = get_station_code(from_location, from_error)
+    if (from_station_code == from_error):
+        return from_error
+    to_station_code = get_station_code(to_location, to_error)
+    if (to_station_code == to_error):
+        return to_error
+    path = dijkstra(from_station_code, to_station_code)
+    print(path)
+    return path
+    
 
 def get_station_code(location, error_message):
     if (location in constants.STATION_CODES):

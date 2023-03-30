@@ -1,7 +1,8 @@
 import heapq
 from build_graph import load_graph, Graph, GraphNode
 
-def dijkstra(graph, start, end):
+def dijkstra(start, end):
+    graph = load_graph()
     # Initialize distances and visited sets
     distances = {node: float('inf') for node in graph.nodes}
     distances[start] = 0
@@ -56,5 +57,5 @@ def dijkstra(graph, start, end):
 
 if __name__ == "__main__":
     graph = load_graph()
-    path = dijkstra(graph, "N01", "J03")
+    path = dijkstra("N01", "J03")
     print(path)
