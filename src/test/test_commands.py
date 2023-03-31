@@ -95,7 +95,7 @@ class TestCommands(unittest.TestCase):
             }]
         }
         mock_make_wmata_request.return_value = data
-        self.assertEqual(app.handle_commands(command, location), 36)
+        self.assertEqual(app.handle_commands(command, location), "The estimated rail time from McLean to Ashburn is 36")
 
         location = [
             "Woodley", "Park-Zoo/Adams", "Morgan", "to", "Gallery",
@@ -107,13 +107,7 @@ class TestCommands(unittest.TestCase):
             }]
         }
         mock_make_wmata_request.return_value = data
-        self.assertEqual(app.handle_commands(command, location), 8)
-
-    def test_command_from_to_without_to(self):
-        command = "from"
-        location = ["McLean", "Ashburn"]  # "to" is a required input
-        result = "Error: please follow a 'from' start 'to' end format"
-        self.assertEqual(app.handle_commands(command, location), result)
+        self.assertEqual(app.handle_commands(command, location), "The estimated rail time from Woodley Park-Zoo/Adams Morgan to Gallery Pl-Chinatown is 8")
 
     def test_command_from_to_location_not_recognized(self):
         command = "from"
@@ -125,6 +119,12 @@ class TestCommands(unittest.TestCase):
         print(app.handle_commands(command, location))
         self.assertEqual(app.handle_commands(command, location), result)
 
+    def test_command_from_to_error(self):
+        command = "from"
+        location = ["Ashburn", "to", "Ashburn"]
+        result = constants.ERROR_DUPLICATE_LOCATIONS
+        self.assertEqual(app.handle_commands(command, location), result)
+
     def test_make_wmata_request(self):
         sample_endpoint = "/StationPrediction.svc/json/GetPrediction/N01?"
         bad_endpoint = "bad_endpoint"
@@ -133,6 +133,43 @@ class TestCommands(unittest.TestCase):
         result = app.make_wmata_request(bad_endpoint)
         self.assertTrue(constants.ERROR_CONN in result)
 
+    def test_command_path(self):
+        command = "path"
+        location = ["McLean", "to", "Court", "House"]
+        expected_path = "McLean -> East Falls Church -> Ballston-MU -> Virginia Square-GMU -> Clarendon -> Court House"
+        self.assertEqual(app.handle_commands(command, location), expected_path)
+
+        command = "path"
+        location = ["Waterfront", "to", "Arlington", "Cemetery"]
+        expected_path = "Waterfront -> L'Enfant Plaza -> Pentagon -> Arlington Cemetery"
+        self.assertEqual(app.handle_commands(command, location), expected_path)
+
+        location = ["Smithsonian", "to", "Ronald", "Reagan", "Washington", "National", "Airport"]
+        expected_path = "Smithsonian -> L'Enfant Plaza -> Pentagon -> Pentagon City -> Crystal City -> Ronald Reagan Washington National Airport"
+        self.assertEqual(app.handle_commands(command, location), expected_path)
+
+    def test_command_path_error(self):
+        command = "path"
+        location = ["McLean", "to", "McLean"]
+        expected_error = constants.ERROR_DUPLICATE_LOCATIONS
+        self.assertEqual(app.handle_commands(command, location), expected_error)
+
+    def test_process_multi_word_locations(self):
+        locations = ["McLean", "to", "Court", "House"]
+        expected = ["McLean", "Court House"]
+        self.assertEqual(app.process_multi_word_locations(*locations), expected)
+        locations = ["McLean", "Court", "House"]
+        expected = [constants.ERROR_FROM_TO]
+        self.assertEqual(app.process_multi_word_locations(*locations), expected)
+        locations = [" ", "to", "Smithsonian"]
+        expected = [constants.ERROR_EMPTY_LOCATION]
+        self.assertEqual(app.process_multi_word_locations(*locations), expected)
+        locations = ["Glenmont", "to"]
+        expected = [constants.ERROR_EMPTY_LOCATION]
+        self.assertEqual(app.process_multi_word_locations(*locations), expected)
+        locations = ["Glenmont", "to", "Glenmont"]
+        expected = [constants.ERROR_DUPLICATE_LOCATIONS]
+        self.assertEqual(app.process_multi_word_locations(*locations), expected)
 
 if __name__ == '__main__':
     unittest.main()

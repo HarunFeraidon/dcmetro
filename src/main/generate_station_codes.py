@@ -30,28 +30,5 @@ def map_station_codes_to_name(data):
     print(station_codes)
     return station_codes
 
-
-def get_stations_per_color():
-    params = urllib.parse.urlencode({
-        # Request parameters
-        'LineCode': 'SV',
-    })
-
-    colors = ["RD", "YL", "GR", "BL", "OR", "SV"]
-
-    try:
-        conn = http.client.HTTPSConnection('api.wmata.com')
-        for color in colors:
-            conn.request("GET","/Rail.svc/json/jStations?LineCode=%s" % color, "{body}", headers)
-            response = conn.getresponse()
-            data = response.read().decode('utf-8')
-            data = json.loads(data)
-            print(color)
-            map_station_codes_to_name(data)
-            conn.close()
-    except Exception as e:
-        print("[Errno {0}] {1}".format(e.errno, e.strerror))
-
-
 if __name__ == '__main__':
-    get_stations_per_color()
+    get_station_codes()

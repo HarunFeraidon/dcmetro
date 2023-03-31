@@ -3,6 +3,8 @@ import os
 from dotenv import load_dotenv, find_dotenv
 from main import constants
 # import constants
+from main.dijkstra import dijkstra
+from main.build_graph import Graph, GraphNode
 import json
 
 load_dotenv(find_dotenv())
@@ -18,6 +20,7 @@ def handle_commands(command, args):
     commands = {
         'when': command_when,
         'from': command_from_to,
+        'path': command_path,
     }
     if command in commands:
         return commands[command](*args)
@@ -58,13 +61,12 @@ def organize_for_when(data):
         )
     return arrivals
 
-
-def command_from_to(*locations):
+def process_multi_word_locations(*locations):
     before_to = []
     after_to = []
     found_to = False
-
     for loc in locations:
+        loc = loc.strip()   
         if loc.lower() == "to":
             found_to = True
         elif not found_to:
@@ -72,9 +74,21 @@ def command_from_to(*locations):
         else:
             after_to.append(loc)
     if not found_to:
-        return "Error: please follow a 'from' start 'to' end format"
+        return [constants.ERROR_FROM_TO]
     from_location = " ".join(before_to)
     to_location = " ".join(after_to)
+    if(from_location == to_location):
+        return [constants.ERROR_DUPLICATE_LOCATIONS]
+    if(from_location == "" or to_location == ""):
+        return [constants.ERROR_EMPTY_LOCATION]
+    return [from_location, to_location]
+
+def command_from_to(*locations):
+    processed_locations = process_multi_word_locations(*locations)
+    if(len(processed_locations) == 1):
+        return processed_locations[0]
+    else:
+        from_location, to_location = processed_locations
     from_error = "'From' location not recognized"
     to_error = "'To' location not recognized"
     from_station_code = get_station_code(from_location, from_error)
@@ -99,11 +113,30 @@ def command_from_to(*locations):
 def organize_from_to(data, from_location, to_location):
     info = data["StationToStationInfos"][0]
     rail_time = info["RailTime"]
-    print(
-        f"The estimated rail time from {from_location} to {to_location} is {rail_time}"
-    )
-    return rail_time
+    return f"The estimated rail time from {from_location} to {to_location} is {rail_time}"
 
+def command_path(*locations):
+    processed_locations = process_multi_word_locations(*locations)
+    if(len(processed_locations) == 1):
+        return processed_locations[0]
+    else:
+        from_location, to_location = processed_locations
+    from_error = "'From' location not recognized"
+    to_error = "'To' location not recognized"
+    from_station_code = get_station_code(from_location, from_error)
+    if (from_station_code == from_error):
+        return from_error
+    to_station_code = get_station_code(to_location, to_error)
+    if (to_station_code == to_error):
+        return to_error
+    path = dijkstra(from_station_code, to_station_code)
+    path_with_names = []
+    for code in path:
+        path_with_names.append(get_station_name(code)) # error message not necessart since impossible at this point
+    path = ' -> '.join(path_with_names)
+    print(path)
+    return path
+    
 
 def get_station_code(location, error_message):
     if (location in constants.STATION_CODES):
@@ -112,7 +145,14 @@ def get_station_code(location, error_message):
     else:
         return error_message
 
-
+def get_station_name(station_code):
+    # list out keys and values separately
+    key_list = list(constants.STATION_CODES.keys())
+    val_list = list(constants.STATION_CODES.values())
+    
+    position = val_list.index(station_code)
+    return key_list[position]
+    
 def make_wmata_request(endpoint):
     try:
         conn = http.client.HTTPSConnection('api.wmata.com')
@@ -121,10 +161,8 @@ def make_wmata_request(endpoint):
         data = response.read().decode('utf-8')
         data = json.loads(data)
         conn.close()
-        # print(data)
         return data
     except Exception as e:
-        # print({constants.ERROR_CONN, str(e)})
         return {constants.ERROR_CONN: str(e)}
         # print("[Errno {0}] {1}".format(e.errno, e.strerror))
 
@@ -147,8 +185,6 @@ def process_input():
             if len(args) == 0:
                 continue
             handle_commands(command, args)
-            # print(inputs[0])
-            # print(inputs[1])
     except KeyboardInterrupt:
         print("\nExecution interrupted by the user.")
     except Exception as e:
