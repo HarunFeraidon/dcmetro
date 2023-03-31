@@ -148,6 +148,10 @@ class TestCommands(unittest.TestCase):
         expected_path = "Smithsonian -> L'Enfant Plaza -> Pentagon -> Pentagon City -> Crystal City -> Ronald Reagan Washington National Airport"
         self.assertEqual(app.handle_commands(command, location), expected_path)
 
+        location = ["Mt", "Vernon", "Sq", "7th", "St-Convention", "Center", "to", "Dupont", "Circle",]
+        expected_path = "Mt Vernon Sq 7th St-Convention Center -> Gallery Pl-Chinatown -> Metro Center -> Farragut North -> Dupont Circle"
+        self.assertEqual(app.handle_commands(command, location), expected_path)
+
     def test_command_path_error(self):
         command = "path"
         location = ["McLean", "to", "McLean"]
