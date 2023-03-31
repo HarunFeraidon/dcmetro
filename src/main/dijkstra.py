@@ -51,9 +51,9 @@ def dijkstra(start, end):
     path.append(start)
     
     # Reverse the path and convert it to a string
-    path = ' -> '.join(reversed(path))
+    # path = ' -> '.join(reversed(path))
     
-    return path
+    return reversed(path)
 
 if __name__ == "__main__":
     graph = load_graph()

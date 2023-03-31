@@ -120,6 +120,10 @@ def command_path(*locations):
     if (to_station_code == to_error):
         return to_error
     path = dijkstra(from_station_code, to_station_code)
+    path_with_names = []
+    for code in path:
+        path_with_names.append(get_station_code(code, "")) # error message not necessart since impossible at this point
+    path = ' -> '.join(path_with_names)
     print(path)
     return path
     
@@ -130,8 +134,7 @@ def get_station_code(location, error_message):
         # print("Location name: {} Code: {}".format(location, constants.STATION_CODES[location]))
     else:
         return error_message
-
-
+    
 def make_wmata_request(endpoint):
     try:
         conn = http.client.HTTPSConnection('api.wmata.com')
