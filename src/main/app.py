@@ -1,10 +1,10 @@
 import http.client, urllib.request, urllib.parse, urllib.error, base64
 import os
 from dotenv import load_dotenv, find_dotenv
-# from main import constants
-import constants
-from dijkstra import dijkstra
-from build_graph import Graph, GraphNode
+from main import constants
+# import constants
+from main.dijkstra import dijkstra
+from main.build_graph import Graph, GraphNode
 import json
 
 load_dotenv(find_dotenv())
@@ -66,6 +66,7 @@ def process_multi_word_locations(*locations):
     after_to = []
     found_to = False
     for loc in locations:
+        loc = loc.strip()   
         if loc.lower() == "to":
             found_to = True
         elif not found_to:
@@ -73,13 +74,21 @@ def process_multi_word_locations(*locations):
         else:
             after_to.append(loc)
     if not found_to:
-        return "Error: please follow a 'from' start 'to' end format"
+        return [constants.ERROR_FROM_TO]
     from_location = " ".join(before_to)
     to_location = " ".join(after_to)
-    return from_location, to_location
+    if(from_location == to_location):
+        return [constants.ERROR_DUPLICATE_LOCATIONS]
+    if(from_location == "" or to_location == ""):
+        return [constants.ERROR_EMPTY_LOCATION]
+    return [from_location, to_location]
 
 def command_from_to(*locations):
-    from_location, to_location = process_multi_word_locations(*locations)
+    processed_locations = process_multi_word_locations(*locations)
+    if(len(processed_locations) == 1):
+        return processed_locations[0]
+    else:
+        from_location, to_location = processed_locations
     from_error = "'From' location not recognized"
     to_error = "'To' location not recognized"
     from_station_code = get_station_code(from_location, from_error)
@@ -104,13 +113,14 @@ def command_from_to(*locations):
 def organize_from_to(data, from_location, to_location):
     info = data["StationToStationInfos"][0]
     rail_time = info["RailTime"]
-    print(
-        f"The estimated rail time from {from_location} to {to_location} is {rail_time}"
-    )
-    return rail_time
+    return f"The estimated rail time from {from_location} to {to_location} is {rail_time}"
 
 def command_path(*locations):
-    from_location, to_location = process_multi_word_locations(*locations)
+    processed_locations = process_multi_word_locations(*locations)
+    if(len(processed_locations) == 1):
+        return processed_locations[0]
+    else:
+        from_location, to_location = processed_locations
     from_error = "'From' location not recognized"
     to_error = "'To' location not recognized"
     from_station_code = get_station_code(from_location, from_error)
@@ -151,10 +161,8 @@ def make_wmata_request(endpoint):
         data = response.read().decode('utf-8')
         data = json.loads(data)
         conn.close()
-        # print(data)
         return data
     except Exception as e:
-        # print({constants.ERROR_CONN, str(e)})
         return {constants.ERROR_CONN: str(e)}
         # print("[Errno {0}] {1}".format(e.errno, e.strerror))
 
@@ -177,8 +185,6 @@ def process_input():
             if len(args) == 0:
                 continue
             handle_commands(command, args)
-            # print(inputs[0])
-            # print(inputs[1])
     except KeyboardInterrupt:
         print("\nExecution interrupted by the user.")
     except Exception as e:

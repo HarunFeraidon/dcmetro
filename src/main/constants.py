@@ -1,4 +1,7 @@
-ERROR_CONN = "Error, connection is broken"
+ERROR_CONN = "Error: connection is broken"
+ERROR_FROM_TO = "Error: please follow a 'from' start 'to' end format"
+ERROR_DUPLICATE_LOCATIONS = "Error: please do not enter duplicate locations"
+ERROR_EMPTY_LOCATION = "Error: please enter a 'from' location and a 'to' location"
 
 LINE_CODES = {
     'Red' : 'RD',
