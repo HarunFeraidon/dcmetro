@@ -134,18 +134,26 @@ class TestCommands(unittest.TestCase):
         self.assertTrue(constants.ERROR_CONN in result)
 
     def test_command_path(self):
+        # all silver line
         command = "path"
         location = ["McLean", "to", "Court", "House"]
         expected_path = "McLean -> East Falls Church -> Ballston-MU -> Virginia Square-GMU -> Clarendon -> Court House"
         self.assertEqual(app.handle_commands(command, location), expected_path)
 
+        # green to yellow to blue
         command = "path"
         location = ["Waterfront", "to", "Arlington", "Cemetery"]
         expected_path = "Waterfront -> L'Enfant Plaza -> Pentagon -> Arlington Cemetery"
         self.assertEqual(app.handle_commands(command, location), expected_path)
 
+        # blue to yellow to blue, making sure that solution isnt all blue line (thus not shortest path)
         location = ["Smithsonian", "to", "Ronald", "Reagan", "Washington", "National", "Airport"]
         expected_path = "Smithsonian -> L'Enfant Plaza -> Pentagon -> Pentagon City -> Crystal City -> Ronald Reagan Washington National Airport"
+        self.assertEqual(app.handle_commands(command, location), expected_path)
+
+        # green to red to silver
+        location = ["Mt", "Vernon", "Sq", "7th", "St-Convention", "Center", "to", "McPherson", "Square",]
+        expected_path = "Mt Vernon Sq 7th St-Convention Center -> Gallery Pl-Chinatown -> Metro Center -> McPherson Square"
         self.assertEqual(app.handle_commands(command, location), expected_path)
 
     def test_command_path_error(self):
