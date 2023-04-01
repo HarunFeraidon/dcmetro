@@ -8,7 +8,7 @@ headers = {
 }
 
 
-def get_station_codes():
+def get_station_codes() -> None:
     try:
         conn = http.client.HTTPSConnection('api.wmata.com')
         conn.request("GET", "/Rail.svc/json/jStations", "{body}", headers)
@@ -21,7 +21,7 @@ def get_station_codes():
         print("[Errno {0}] {1}".format(e.errno, e.strerror))
 
 
-def map_station_codes_to_name(data):
+def map_station_codes_to_name(data: dict) -> dict:
     station_codes = {}
     stations_list = data["Stations"]
     for station in stations_list:

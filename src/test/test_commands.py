@@ -95,7 +95,9 @@ class TestCommands(unittest.TestCase):
             }]
         }
         mock_make_wmata_request.return_value = data
-        self.assertEqual(app.handle_commands(command, location), "The estimated rail time from McLean to Ashburn is 36")
+        self.assertEqual(
+            app.handle_commands(command, location),
+            "The estimated rail time from McLean to Ashburn is 36")
 
         location = [
             "Woodley", "Park-Zoo/Adams", "Morgan", "to", "Gallery",
@@ -107,7 +109,10 @@ class TestCommands(unittest.TestCase):
             }]
         }
         mock_make_wmata_request.return_value = data
-        self.assertEqual(app.handle_commands(command, location), "The estimated rail time from Woodley Park-Zoo/Adams Morgan to Gallery Pl-Chinatown is 8")
+        self.assertEqual(
+            app.handle_commands(command, location),
+            "The estimated rail time from Woodley Park-Zoo/Adams Morgan to Gallery Pl-Chinatown is 8"
+        )
 
     def test_command_from_to_location_not_recognized(self):
         command = "from"
@@ -147,12 +152,25 @@ class TestCommands(unittest.TestCase):
         self.assertEqual(app.handle_commands(command, location), expected_path)
 
         # blue to yellow to blue, making sure that solution isnt all blue line (thus not shortest path)
-        location = ["Smithsonian", "to", "Ronald", "Reagan", "Washington", "National", "Airport"]
+        location = [
+            "Smithsonian", "to", "Ronald", "Reagan", "Washington", "National",
+            "Airport"
+        ]
         expected_path = "Smithsonian -> L'Enfant Plaza -> Pentagon -> Pentagon City -> Crystal City -> Ronald Reagan Washington National Airport"
         self.assertEqual(app.handle_commands(command, location), expected_path)
 
         # green to red to silver
-        location = ["Mt", "Vernon", "Sq", "7th", "St-Convention", "Center", "to", "McPherson", "Square",]
+        location = [
+            "Mt",
+            "Vernon",
+            "Sq",
+            "7th",
+            "St-Convention",
+            "Center",
+            "to",
+            "McPherson",
+            "Square",
+        ]
         expected_path = "Mt Vernon Sq 7th St-Convention Center -> Gallery Pl-Chinatown -> Metro Center -> McPherson Square"
         self.assertEqual(app.handle_commands(command, location), expected_path)
 
@@ -160,24 +178,31 @@ class TestCommands(unittest.TestCase):
         command = "path"
         location = ["McLean", "to", "McLean"]
         expected_error = constants.ERROR_DUPLICATE_LOCATIONS
-        self.assertEqual(app.handle_commands(command, location), expected_error)
+        self.assertEqual(app.handle_commands(command, location),
+                         expected_error)
 
     def test_process_multi_word_locations(self):
         locations = ["McLean", "to", "Court", "House"]
         expected = ["McLean", "Court House"]
-        self.assertEqual(app.process_multi_word_locations(*locations), expected)
+        self.assertEqual(app.process_multi_word_locations(*locations),
+                         expected)
         locations = ["McLean", "Court", "House"]
         expected = [constants.ERROR_FROM_TO]
-        self.assertEqual(app.process_multi_word_locations(*locations), expected)
+        self.assertEqual(app.process_multi_word_locations(*locations),
+                         expected)
         locations = [" ", "to", "Smithsonian"]
         expected = [constants.ERROR_EMPTY_LOCATION]
-        self.assertEqual(app.process_multi_word_locations(*locations), expected)
+        self.assertEqual(app.process_multi_word_locations(*locations),
+                         expected)
         locations = ["Glenmont", "to"]
         expected = [constants.ERROR_EMPTY_LOCATION]
-        self.assertEqual(app.process_multi_word_locations(*locations), expected)
+        self.assertEqual(app.process_multi_word_locations(*locations),
+                         expected)
         locations = ["Glenmont", "to", "Glenmont"]
         expected = [constants.ERROR_DUPLICATE_LOCATIONS]
-        self.assertEqual(app.process_multi_word_locations(*locations), expected)
+        self.assertEqual(app.process_multi_word_locations(*locations),
+                         expected)
+
 
 if __name__ == '__main__':
     unittest.main()
