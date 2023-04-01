@@ -16,7 +16,7 @@ headers = {
 }
 
 
-def handle_commands(command, args):
+def handle_commands(command: str, args: list) -> str:
     commands = {
         'when': command_when,
         'from': command_from_to,
@@ -29,7 +29,7 @@ def handle_commands(command, args):
         return error
 
 
-def command_when(*locations):
+def command_when(*locations: list) -> str:
     location = " ".join(locations)
     error_message = "Location not recognized"
     station_code = get_station_code(location, error_message)
@@ -39,17 +39,18 @@ def command_when(*locations):
     params = urllib.parse.urlencode({})
     endpoint = f"/StationPrediction.svc/json/GetPrediction/{station_code}?{params}"
     data = make_wmata_request(endpoint)
-    if(connection_broken(data)):
+    if (connection_broken(data)):
         return constants.ERROR_CONN
     arrivals = organize_for_when(data)
     return arrivals
 
 
-def organize_for_when(data):
+def organize_for_when(data: dict) -> dict:
     arrivals = {}
     results = data["Trains"]
     for result in results:
-        if(result["DestinationCode"] == None or result["Min"] == '' or result["Car"] == None):
+        if (result["DestinationCode"] == None or result["Min"] == ''
+                or result["Car"] == None):
             continue
         minute = result["Min"]
         destination = result["Destination"]
@@ -61,12 +62,13 @@ def organize_for_when(data):
         )
     return arrivals
 
-def process_multi_word_locations(*locations):
+
+def process_multi_word_locations(*locations: list) -> list:
     before_to = []
     after_to = []
     found_to = False
     for loc in locations:
-        loc = loc.strip()   
+        loc = loc.strip()
         if loc.lower() == "to":
             found_to = True
         elif not found_to:
@@ -77,15 +79,16 @@ def process_multi_word_locations(*locations):
         return [constants.ERROR_FROM_TO]
     from_location = " ".join(before_to)
     to_location = " ".join(after_to)
-    if(from_location == to_location):
+    if (from_location == to_location):
         return [constants.ERROR_DUPLICATE_LOCATIONS]
-    if(from_location == "" or to_location == ""):
+    if (from_location == "" or to_location == ""):
         return [constants.ERROR_EMPTY_LOCATION]
     return [from_location, to_location]
 
-def command_from_to(*locations):
+
+def command_from_to(*locations: list) -> str:
     processed_locations = process_multi_word_locations(*locations)
-    if(len(processed_locations) == 1):
+    if (len(processed_locations) == 1):
         return processed_locations[0]
     else:
         from_location, to_location = processed_locations
@@ -104,20 +107,21 @@ def command_from_to(*locations):
     })
     endpoint = f"/Rail.svc/json/jSrcStationToDstStationInfo?{params}"
     data = make_wmata_request(endpoint)
-    if(connection_broken(data)):
+    if (connection_broken(data)):
         return constants.ERROR_CONN
     rail_time = organize_from_to(data, from_location, to_location)
     return rail_time
 
 
-def organize_from_to(data, from_location, to_location):
+def organize_from_to(data: dict, from_location: str, to_location: str) -> str:
     info = data["StationToStationInfos"][0]
     rail_time = info["RailTime"]
     return f"The estimated rail time from {from_location} to {to_location} is {rail_time}"
 
-def command_path(*locations):
+
+def command_path(*locations: list) -> str:
     processed_locations = process_multi_word_locations(*locations)
-    if(len(processed_locations) == 1):
+    if (len(processed_locations) == 1):
         return processed_locations[0]
     else:
         from_location, to_location = processed_locations
@@ -132,28 +136,32 @@ def command_path(*locations):
     path = dijkstra(from_station_code, to_station_code)
     path_with_names = []
     for code in path:
-        path_with_names.append(get_station_name(code)) # error message not necessart since impossible at this point
+        path_with_names.append(
+            get_station_name(code)
+        )  # error message not necessart since impossible at this point
     path = ' -> '.join(path_with_names)
     print(path)
     return path
-    
 
-def get_station_code(location, error_message):
+
+def get_station_code(location: str, error_message: str) -> str:
     if (location in constants.STATION_CODES):
         return constants.STATION_CODES[location]
         # print("Location name: {} Code: {}".format(location, constants.STATION_CODES[location]))
     else:
         return error_message
 
-def get_station_name(station_code):
+
+def get_station_name(station_code: str) -> str:
     # list out keys and values separately
     key_list = list(constants.STATION_CODES.keys())
     val_list = list(constants.STATION_CODES.values())
-    
+
     position = val_list.index(station_code)
     return key_list[position]
-    
-def make_wmata_request(endpoint):
+
+
+def make_wmata_request(endpoint: str) -> dict:
     try:
         conn = http.client.HTTPSConnection('api.wmata.com')
         conn.request("GET", f"{endpoint}", "{body}", headers)
@@ -166,14 +174,14 @@ def make_wmata_request(endpoint):
         return {constants.ERROR_CONN: str(e)}
         # print("[Errno {0}] {1}".format(e.errno, e.strerror))
 
-def connection_broken(data):
+
+def connection_broken(data: dict) -> bool:
     if constants.ERROR_CONN in data:
         return True
     return False
-    
 
 
-def process_input():
+def process_input() -> None:
     try:
         while True:
             user_input = input("Enter a command: ")

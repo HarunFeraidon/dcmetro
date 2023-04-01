@@ -1,4 +1,5 @@
 !help information on commands
+!help station list --color 
 
 !when <color> <station>
 

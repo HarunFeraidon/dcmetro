@@ -3,17 +3,20 @@ import urllib.parse
 
 colors = ["RD", "YL", "GR", "BL", "OR", "SV"]
 
-def get_each_lines_start_and_end_stations():
+
+def get_each_lines_start_and_end_stations() -> dict:
     endpoint = "/Rail.svc/json/jLines"
-    data = make_wmata_request(endpoint) 
+    data = make_wmata_request(endpoint)
     result = {}
     lines = data["Lines"]
     for line in lines:
-        result.setdefault(line["LineCode"], (line["StartStationCode"], line["EndStationCode"]))
+        result.setdefault(line["LineCode"],
+                          (line["StartStationCode"], line["EndStationCode"]))
     generate_all_lines_path(result)
     return result
 
-def generate_all_lines_path(lines):
+
+def generate_all_lines_path(lines: dict) -> dict:
     lines_with_stops = {}
     for line in lines:
         params = urllib.parse.urlencode({
@@ -30,6 +33,7 @@ def generate_all_lines_path(lines):
         lines_with_stops.setdefault(line, info)
     print(lines_with_stops)
     return lines_with_stops
+
 
 if __name__ == '__main__':
     get_each_lines_start_and_end_stations()
