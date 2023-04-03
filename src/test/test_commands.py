@@ -37,9 +37,13 @@ class TestCommands(unittest.TestCase):
                 'Min': '32'
             }]
         }
-        results = {'Largo': ['6', '26'], 'Ashburn': ['BRD', '15', '32']}
+        results_dict = {'Ashburn': ['BRD', '15', '32'], 'Largo': ['6', '26'],}
+        results_list = []
+        for platform in results_dict:
+            results_list.append(f"For {platform}, the next arrivals are in {', '.join(results_dict[platform])} minutes")
+        answer = "\n".join(results_list)
         mock_make_wmata_request.return_value = data
-        self.assertEqual(app.handle_commands(command, location), results)
+        self.assertEqual(app.handle_commands(command, location), answer)
 
         location = ["NoMa-Gallaudet", "U"]
         data = {
@@ -70,9 +74,15 @@ class TestCommands(unittest.TestCase):
                 'Min': ''
             }]
         }
-        results = {'Largo': ['BRD'], 'Vienna': ['BRD']}
+        results_dict = {'Largo': ['BRD'], 'Vienna': ['BRD']}
+        results_list = []
+        for result in results_dict:
+            results_list.append(
+                f"For {result}, the next arrivals are in {', '.join(results_dict[result])} minutes"
+            )
+        answer = "\n".join(results_list)
         mock_make_wmata_request.return_value = data
-        self.assertEqual(app.handle_commands(command, location), results)
+        self.assertEqual(app.handle_commands(command, location), answer)
 
     def test_command_not_found(self):
         command = "whn"

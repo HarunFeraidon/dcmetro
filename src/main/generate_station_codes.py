@@ -1,5 +1,5 @@
 import http.client, urllib.request, urllib.parse, urllib.error, base64
-import app
+from . import app
 import json
 
 headers = {

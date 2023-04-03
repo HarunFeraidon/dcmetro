@@ -1,5 +1,5 @@
 import heapq
-from main.build_graph import load_graph, Graph, GraphNode
+from .build_graph import load_graph, Graph, GraphNode
 
 
 def dijkstra(start: str, end: str) -> list:

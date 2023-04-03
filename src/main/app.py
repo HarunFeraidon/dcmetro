@@ -1,20 +1,60 @@
 import http.client, urllib.request, urllib.parse, urllib.error, base64
 import os
 from dotenv import load_dotenv, find_dotenv
-from main import constants
-# import constants
-from main.dijkstra import dijkstra
-from main.build_graph import Graph, GraphNode
+# from main import constants
+from . import constants
+from .dijkstra import dijkstra
+from .build_graph import Graph, GraphNode
 import json
+from textual.app import App, ComposeResult
+from textual.widgets import Input, Label, Markdown, Static, Footer
+from textual.containers import Content, Container
+
+class InputRow(Static):
+    CSS_PATH = "app.css"
+    def compose(self) -> ComposeResult:
+        yield Input(placeholder="Enter a command", id="input-field")
+        with Container(id="results-container"):
+            yield Static(id="results")
+
+class DcMetroApp(App):
+    BINDINGS = [
+        ("c", "clear", "Clear"),
+    ]
+    def compose(self) -> ComposeResult:
+        """Create child widgets for the app."""
+        yield InputRow()
+        yield Footer()
+        
+    def on_mount(self) -> None:
+        """Called when app starts."""
+        # Give the input focus, so we can start typing straight away
+        self.query_one(Input).focus()
+
+    def on_input_submitted(self, message: Input.Submitted) -> None:
+        """A coroutine to handle a text changed message."""
+        if message.value:
+            # Look up the word in the background
+            result = process_message(message.value)
+            self.query_one("#results", Static).update(str(result))
+        else:
+            # Clear the results
+            self.query_one("#results", Static).update("")
+    
+    def action_clear(self) -> None:
+        """Clear the input field and previous output."""
+        input = self.query_one("#input-field")
+        result = self.query_one("result")
+        input.value = ""
+        result.update(renderable='')
+
 
 load_dotenv(find_dotenv())
 API_KEY = os.environ.get("API_KEY")
-
 headers = {
     # Request headers
     'api_key': API_KEY,
 }
-
 
 def handle_commands(command: str, args: list) -> str:
     commands = {
@@ -45,7 +85,7 @@ def command_when(*locations: list) -> str:
     return arrivals
 
 
-def organize_for_when(data: dict) -> dict:
+def organize_for_when(data: dict) -> str:
     arrivals = {}
     results = data["Trains"]
     for result in results:
@@ -56,11 +96,12 @@ def organize_for_when(data: dict) -> dict:
         destination = result["Destination"]
         arrivals.setdefault(destination, [])
         arrivals[destination].append(minute)
+    arrivals_list = []
     for platform in arrivals:
-        print(
+        arrivals_list.append(
             f"For {platform}, the next arrivals are in {', '.join(arrivals[platform])} minutes"
         )
-    return arrivals
+    return "\n".join(arrivals_list)
 
 
 def process_multi_word_locations(*locations: list) -> list:
@@ -198,6 +239,18 @@ def process_input() -> None:
     except Exception as e:
         print(e)
 
+def process_message(message) -> str:
+    inputs = message.split()
+    if len(inputs) == 0:
+        return ""
+    command = inputs[0]
+    args = inputs[1:]
+    if len(args) == 0:
+        return ""
+    return handle_commands(command, args)
 
-if __name__ == '__main__':
-    process_input()
+
+if __name__ == "__main__":
+    app = DcMetroApp()
+    app.run()
+    # process_input()

@@ -1,4 +1,4 @@
-from app import make_wmata_request, headers
+from .app import make_wmata_request, headers
 import urllib.parse
 
 colors = ["RD", "YL", "GR", "BL", "OR", "SV"]
