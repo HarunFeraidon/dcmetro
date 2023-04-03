@@ -14,8 +14,8 @@ class InputRow(Static):
     CSS_PATH = "app.css"
     def compose(self) -> ComposeResult:
         yield Input(placeholder="Enter a command", id="input-field")
-        with Container(id="results-container"):
-            yield Static(id="results")
+        yield Static(id="query")
+        yield Static(id="results")
 
 class DcMetroApp(App):
     BINDINGS = [
@@ -34,17 +34,15 @@ class DcMetroApp(App):
     def on_input_submitted(self, message: Input.Submitted) -> None:
         """A coroutine to handle a text changed message."""
         if message.value:
-            # Look up the word in the background
             result = process_message(message.value)
+            self.query_one("#query", Static).update(message.value)
             self.query_one("#results", Static).update(str(result))
-        else:
-            # Clear the results
-            self.query_one("#results", Static).update("")
+        message.input.value = ""
     
     def action_clear(self) -> None:
         """Clear the input field and previous output."""
         input = self.query_one("#input-field")
-        result = self.query_one("result")
+        result = self.query_one("#results")
         input.value = ""
         result.update(renderable='')
 
