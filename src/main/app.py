@@ -13,9 +13,14 @@ from textual.containers import Content, Container
 class InputRow(Static):
     CSS_PATH = "app.css"
     def compose(self) -> ComposeResult:
-        yield Input(placeholder="Enter a command", id="input-field")
-        yield Static(id="query")
-        yield Static(id="results")
+        self.query_widget = Static(classes="query")
+        self.results_widget = Static(classes="results")
+        yield self.query_widget
+        yield self.results_widget
+    
+    def on_mount(self) -> None:
+        self.query_widget.styles.border = ("heavy", "#F0EDCC")
+        self.query_widget.styles.background = "#02343F"
 
 class DcMetroApp(App):
     BINDINGS = [
@@ -23,7 +28,9 @@ class DcMetroApp(App):
     ]
     def compose(self) -> ComposeResult:
         """Create child widgets for the app."""
-        yield InputRow()
+        self.input_widget = Input(placeholder="Enter a command", classes="input-field")
+        yield self.input_widget
+        yield Container(InputRow(), id="results-container")
         yield Footer()
         
     def on_mount(self) -> None:
@@ -35,14 +42,15 @@ class DcMetroApp(App):
         """A coroutine to handle a text changed message."""
         if message.value:
             result = process_message(message.value)
-            self.query_one("#query", Static).update(message.value)
-            self.query_one("#results", Static).update(str(result))
-        message.input.value = ""
+            self.query(".query").last().update(f"> {message.value}")
+            self.query(".results").last().update(str(result))
+            message.input.value = ""
+            self.query_one("#results-container").mount(InputRow())
     
     def action_clear(self) -> None:
         """Clear the input field and previous output."""
-        input = self.query_one("#input-field")
-        result = self.query_one("#results")
+        input = self.query_one(".input-field")
+        result = self.query_one(".results")
         input.value = ""
         result.update(renderable='')
 
