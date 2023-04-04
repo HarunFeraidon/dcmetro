@@ -102,7 +102,7 @@ class TestCommands(unittest.TestCase):
 
     @patch('main.commands.make_wmata_request')
     def test_command_from_to_base(self, mock_make_wmata_request):
-        command = "from"
+        command = "length"
         location = ["McLean", "to", "Ashburn"]
         data = {
             'StationToStationInfos': [{
@@ -130,7 +130,7 @@ class TestCommands(unittest.TestCase):
         )
 
     def test_command_from_to_location_not_recognized(self):
-        command = "from"
+        command = "length"
         location = ["loot", "lake", "to", "Ashburn"]
         result = "'From' location not recognized"
         self.assertEqual(commands.handle_commands(command, location), result)
@@ -140,7 +140,7 @@ class TestCommands(unittest.TestCase):
         self.assertEqual(commands.handle_commands(command, location), result)
 
     def test_command_from_to_error(self):
-        command = "from"
+        command = "length"
         location = ["Ashburn", "to", "Ashburn"]
         result = constants.ERROR_DUPLICATE_LOCATIONS
         self.assertEqual(commands.handle_commands(command, location), result)

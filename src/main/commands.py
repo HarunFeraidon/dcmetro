@@ -17,7 +17,7 @@ headers = {
 def handle_commands(command: str, args: list) -> str:
     commands = {
         'when': command_when,
-        'from': command_from_to,
+        'length': command_from_to,
         'path': command_path,
     }
     if command in commands:
