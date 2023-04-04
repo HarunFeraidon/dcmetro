@@ -112,7 +112,7 @@ class TestCommands(unittest.TestCase):
         mock_make_wmata_request.return_value = data
         self.assertEqual(
             commands.handle_commands(command, location),
-            "The estimated rail time from McLean to Ashburn is 36")
+            "The estimated rail time from McLean to Ashburn is 36 minutes")
 
         location = [
             "Woodley", "Park-Zoo/Adams", "Morgan", "to", "Gallery",
@@ -126,7 +126,7 @@ class TestCommands(unittest.TestCase):
         mock_make_wmata_request.return_value = data
         self.assertEqual(
             commands.handle_commands(command, location),
-            "The estimated rail time from Woodley Park-Zoo/Adams Morgan to Gallery Pl-Chinatown is 8"
+            "The estimated rail time from Woodley Park-Zoo/Adams Morgan to Gallery Pl-Chinatown is 8 minutes"
         )
 
     def test_command_from_to_location_not_recognized(self):

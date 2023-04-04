@@ -1,1 +1,23 @@
-# dc-metro-texts
+## DC Metro Command Line Tool
+![alt text](images/demo.gif)
+
+# What is it
+With this application, you can submit concise commands via your terminal to request and then receive information.
+Useful commands include:
+- `when <location>` to view incoming trains.
+- `length <from_location> to <to_location>` to get an estimated length of rail time (not including stops, which will vary)
+- `path <from_location> to <to_location>` to get the shortest path from one location to the other.
+
+# How it works
+The DC Metro has an [API](https://developer.wmata.com)! This API includes some useful endpoints with the information needed to build out commands, such as the ones above.
+
+The command `path <from_location> to <to_location>` uses a graph respresentation of the DC Metro. Because it is fully connected, it should be possible to get the path from any spot to another. Additionally, if the distance between two nodes was provided, then the shortest path can even be calculated. Luckily, the API has some endpoints that provide enough information to build this. One endpoint provides all the stations on a specific train colors route, from one of its ends to the other. The distance to the previous station was also provided. 
+So, having the stations, in order, of a specific route color, and with distances to the previous station, you are able to create a graph with weighted edges, by iterating through all route colors' list of stations and distances between stations. 
+
+*This was enough to complete a fully connected graph with weighted edges.*
+From here, Dijkstra's algorithm is utilized to find the shortest path between any two nodes in the graph.
+
+<img src="images/graph.png"  width="30%" height="30%">
+
+Finally, the Textual library is used for the terminal user interface.
+
