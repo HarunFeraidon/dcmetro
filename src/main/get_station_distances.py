@@ -31,5 +31,4 @@ def generate_all_lines_path(lines: dict) -> dict:
         for stop in each_stop:
             info.append([stop["StationCode"], stop["DistanceToPrev"]])
         lines_with_stops.setdefault(line, info)
-    print(lines_with_stops)
     return lines_with_stops

@@ -9,23 +9,14 @@ headers = {
 
 
 def get_station_codes() -> None:
-    try:
-        conn = http.client.HTTPSConnection('api.wmata.com')
-        conn.request("GET", "/Rail.svc/json/jStations", "{body}", headers)
-        response = conn.getresponse()
-        data = response.read().decode('utf-8')
-        data = json.loads(data)
-        map_station_codes_to_name(data)
-        conn.close()
-    except Exception as e:
-        print("[Errno {0}] {1}".format(e.errno, e.strerror))
+    endpoint = "/Rail.svc/json/jStations"
+    data = commands.make_wmata_request(endpoint)
+    map_station_codes_to_name(data)
 
 
 def map_station_codes_to_name(data: dict) -> dict:
     station_codes = {}
     stations_list = data["Stations"]
     for station in stations_list:
-        station_codes[station['Name']] = station['Code']
-        # print("Code: {}, Name: {}".format(station['Code'], station['Name']))
-    print(station_codes)
+        station_codes[station['Name'].lower()] = station['Code']
     return station_codes
