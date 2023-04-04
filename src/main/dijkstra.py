@@ -1,5 +1,5 @@
 import heapq
-from main.build_graph import load_graph, Graph, GraphNode
+from .build_graph import load_graph, Graph, GraphNode
 
 
 def dijkstra(start: str, end: str) -> list:
@@ -51,9 +51,3 @@ def dijkstra(start: str, end: str) -> list:
         current_node = graph.nodes[current_node].previous
     path.append(start)
     return reversed(path)
-
-
-if __name__ == "__main__":
-    graph = load_graph()
-    path = dijkstra("N01", "J03")
-    print(path)

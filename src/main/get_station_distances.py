@@ -1,4 +1,4 @@
-from app import make_wmata_request, headers
+from .commands import make_wmata_request, headers
 import urllib.parse
 
 colors = ["RD", "YL", "GR", "BL", "OR", "SV"]
@@ -33,7 +33,3 @@ def generate_all_lines_path(lines: dict) -> dict:
         lines_with_stops.setdefault(line, info)
     print(lines_with_stops)
     return lines_with_stops
-
-
-if __name__ == '__main__':
-    get_each_lines_start_and_end_stations()

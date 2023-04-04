@@ -73,8 +73,3 @@ def load_graph() -> Graph:
 def print_graph(graph: Graph) -> None:
     for node_name, node in graph.nodes.items():
         print(f"{node_name}: {node.edges}")
-
-
-if __name__ == "__main__":
-    graph = load_graph()
-    print(type(graph))
