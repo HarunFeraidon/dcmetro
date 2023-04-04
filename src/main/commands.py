@@ -115,7 +115,7 @@ def command_from_to(*locations: list) -> str:
 def organize_from_to(data: dict, from_location: str, to_location: str) -> str:
     info = data["StationToStationInfos"][0]
     rail_time = info["RailTime"]
-    return f"The estimated rail time from {from_location} to {to_location} is {rail_time}"
+    return f"The estimated rail time from {from_location} to {to_location} is {rail_time} minutes"
 
 
 def command_path(*locations: list) -> str:
