@@ -1,10 +1,10 @@
 import http.client, urllib.request, urllib.parse, urllib.error, base64
-from . import app
+from . import commands
 import json
 
 headers = {
     # Request headers
-    'api_key': app.API_KEY,
+    'api_key': commands.API_KEY,
 }
 
 
@@ -29,6 +29,3 @@ def map_station_codes_to_name(data: dict) -> dict:
         # print("Code: {}, Name: {}".format(station['Code'], station['Name']))
     print(station_codes)
     return station_codes
-
-if __name__ == '__main__':
-    get_station_codes()
