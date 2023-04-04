@@ -7,8 +7,8 @@ from .dijkstra import dijkstra
 from .build_graph import Graph, GraphNode
 import json
 from textual.app import App, ComposeResult
-from textual.widgets import Input, Label, Markdown, Static, Footer
-from textual.containers import Content, Container
+from textual.widgets import Input, Static, Footer
+from textual.containers import Container
 
 class InputRow(Static):
     CSS_PATH = "app.css"
@@ -24,7 +24,7 @@ class InputRow(Static):
 
 class DcMetroApp(App):
     BINDINGS = [
-        ("c", "clear", "Clear"),
+        ("ctrl+shift+c", "clear", "Clear"),
     ]
     def compose(self) -> ComposeResult:
         """Create child widgets for the app."""
@@ -50,9 +50,16 @@ class DcMetroApp(App):
     def action_clear(self) -> None:
         """Clear the input field and previous output."""
         input = self.query_one(".input-field")
-        result = self.query_one(".results")
+        query = self.query(".query")
+        result = self.query(".results")
         input.value = ""
-        result.update(renderable='')
+        while result:
+            result.last().remove()
+            result = self.query(".results")
+            query.last().remove()
+            query = self.query(".query")
+        self.query_one("#results-container").mount(InputRow())
+        
 
 
 load_dotenv(find_dotenv())
