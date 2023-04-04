@@ -19,5 +19,5 @@ From here, Dijkstra's algorithm is utilized to find the shortest path between an
 
 <img src="images/graph.png"  width="30%" height="30%">
 
-Finally, the Textual library is used for the terminal user interface.
+Finally, the [Textual](https://textual.textualize.io) Python library is used for the terminal user interface.
 
