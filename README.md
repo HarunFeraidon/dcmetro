@@ -17,7 +17,7 @@ So, having the stations, in order, of a specific route color, and with distances
 *This was enough to complete a fully connected graph with weighted edges.*
 From here, Dijkstra's algorithm is utilized to find the shortest path between any two nodes in the graph.
 
-<img src="images/graph.png"  width="30%" height="30%">
+<img src="images/graph.png"  width="40%" height="40%">
 
 Finally, the [Textual](https://textual.textualize.io) Python library is used for the terminal user interface.
 
