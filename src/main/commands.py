@@ -13,7 +13,6 @@ headers = {
     'api_key': API_KEY,
 }
 
-
 def handle_commands(command: str, args: list) -> str:
     commands = {
         'when': command_when,
