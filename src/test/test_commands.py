@@ -7,7 +7,7 @@ class TestCommands(unittest.TestCase):
 
     @patch('main.commands.make_wmata_request')
     def test_command_when_base(self, mock_make_wmata_request):
-        command = "when"
+        command = constants.query_when
         location = ["McLean"]
         data = {
             'Trains': [{
@@ -95,14 +95,14 @@ class TestCommands(unittest.TestCase):
         self.assertEqual(commands.handle_commands(command, "McLean"), result)
 
     def test_location_not_recognized(self):
-        command = "when"
+        command = constants.query_when
         location = ["disneyland"]
-        result = "Location not recognized"
+        result = constants.ERROR_LOCATION_NOT_RECOGNIZED
         self.assertEqual(commands.handle_commands(command, location), result)
 
     @patch('main.commands.make_wmata_request')
     def test_command_from_to_base(self, mock_make_wmata_request):
-        command = "length"
+        command = constants.query_length
         location = ["McLean", "to", "Ashburn"]
         data = {
             'StationToStationInfos': [{
@@ -112,7 +112,7 @@ class TestCommands(unittest.TestCase):
         mock_make_wmata_request.return_value = data
         self.assertEqual(
             commands.handle_commands(command, location),
-            "The estimated rail time from McLean to Ashburn is 36 minutes")
+            "The estimated rail time from 'McLean' to 'Ashburn' is 36 minutes")
 
         location = [
             "Woodley", "Park-Zoo/Adams", "Morgan", "to", "Gallery",
@@ -126,21 +126,20 @@ class TestCommands(unittest.TestCase):
         mock_make_wmata_request.return_value = data
         self.assertEqual(
             commands.handle_commands(command, location),
-            "The estimated rail time from Woodley Park-Zoo/Adams Morgan to Gallery Pl-Chinatown is 8 minutes"
+            "The estimated rail time from 'Woodley Park-Zoo/Adams Morgan' to 'Gallery Pl-Chinatown' is 8 minutes"
         )
 
     def test_command_from_to_location_not_recognized(self):
-        command = "length"
+        command = constants.query_length
         location = ["loot", "lake", "to", "Ashburn"]
-        result = "'From' location not recognized"
+        result = constants.ERROR_FROM_LOCATION
         self.assertEqual(commands.handle_commands(command, location), result)
         location = ["Bethesda", "to", "tilted", "towers"]
-        result = "'To' location not recognized"
-        print(commands.handle_commands(command, location))
+        result = constants.ERROR_TO_LOCATION
         self.assertEqual(commands.handle_commands(command, location), result)
 
     def test_command_from_to_error(self):
-        command = "length"
+        command = constants.query_length
         location = ["Ashburn", "to", "Ashburn"]
         result = constants.ERROR_DUPLICATE_LOCATIONS
         self.assertEqual(commands.handle_commands(command, location), result)
@@ -155,16 +154,16 @@ class TestCommands(unittest.TestCase):
 
     def test_command_path(self):
         # all silver line
-        command = "path"
+        command = constants.query_path
         location = ["McLean", "to", "Court", "House"]
-        expected_path = "McLean -> East Falls Church -> Ballston-MU -> Virginia Square-GMU -> Clarendon -> Court House"
+        expected_path = 'mclean -> east falls church -> ballston-mu -> virginia square-gmu -> clarendon -> court house'
         self.assertEqual(commands.handle_commands(command, location),
                          expected_path)
 
         # green to yellow to blue
-        command = "path"
+        command = constants.query_path
         location = ["Waterfront", "to", "Arlington", "Cemetery"]
-        expected_path = "Waterfront -> L'Enfant Plaza -> Pentagon -> Arlington Cemetery"
+        expected_path = "waterfront -> l'enfant plaza -> pentagon -> arlington cemetery"
         self.assertEqual(commands.handle_commands(command, location),
                          expected_path)
 
@@ -173,7 +172,7 @@ class TestCommands(unittest.TestCase):
             "Smithsonian", "to", "Ronald", "Reagan", "Washington", "National",
             "Airport"
         ]
-        expected_path = "Smithsonian -> L'Enfant Plaza -> Pentagon -> Pentagon City -> Crystal City -> Ronald Reagan Washington National Airport"
+        expected_path = "smithsonian -> l'enfant plaza -> pentagon -> pentagon city -> crystal city -> ronald reagan washington national airport"
         self.assertEqual(commands.handle_commands(command, location),
                          expected_path)
 
@@ -189,12 +188,12 @@ class TestCommands(unittest.TestCase):
             "McPherson",
             "Square",
         ]
-        expected_path = "Mt Vernon Sq 7th St-Convention Center -> Gallery Pl-Chinatown -> Metro Center -> McPherson Square"
+        expected_path = 'mt vernon sq 7th st-convention center -> gallery pl-chinatown -> metro center -> mcpherson square'
         self.assertEqual(commands.handle_commands(command, location),
                          expected_path)
 
     def test_command_path_error(self):
-        command = "path"
+        command = constants.query_path
         location = ["McLean", "to", "McLean"]
         expected_error = constants.ERROR_DUPLICATE_LOCATIONS
         self.assertEqual(commands.handle_commands(command, location),

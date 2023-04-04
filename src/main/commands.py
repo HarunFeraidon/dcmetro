@@ -15,9 +15,9 @@ headers = {
 
 def handle_commands(command: str, args: list) -> str:
     commands = {
-        'when': command_when,
-        'length': command_from_to,
-        'path': command_path,
+        constants.query_when: command_when,
+        constants.query_length: command_from_to,
+        constants.query_path: command_path,
     }
     if command in commands:
         return commands[command](*args)
@@ -28,7 +28,7 @@ def handle_commands(command: str, args: list) -> str:
 
 def command_when(*locations: list) -> str:
     location = " ".join(locations)
-    error_message = "Location not recognized"
+    error_message = constants.ERROR_LOCATION_NOT_RECOGNIZED
     station_code = get_station_code(location, error_message)
     if station_code == error_message:
         return error_message
@@ -90,8 +90,8 @@ def command_from_to(*locations: list) -> str:
         return processed_locations[0]
     else:
         from_location, to_location = processed_locations
-    from_error = "'From' location not recognized"
-    to_error = "'To' location not recognized"
+    from_error = constants.ERROR_FROM_LOCATION
+    to_error = constants.ERROR_TO_LOCATION
     from_station_code = get_station_code(from_location, from_error)
     if (from_station_code == from_error):
         return from_error
@@ -114,7 +114,7 @@ def command_from_to(*locations: list) -> str:
 def organize_from_to(data: dict, from_location: str, to_location: str) -> str:
     info = data["StationToStationInfos"][0]
     rail_time = info["RailTime"]
-    return f"The estimated rail time from {from_location} to {to_location} is {rail_time} minutes"
+    return f"The estimated rail time from '{from_location}' to '{to_location}' is {rail_time} minutes"
 
 
 def command_path(*locations: list) -> str:
@@ -123,8 +123,8 @@ def command_path(*locations: list) -> str:
         return processed_locations[0]
     else:
         from_location, to_location = processed_locations
-    from_error = "'From' location not recognized"
-    to_error = "'To' location not recognized"
+    from_error = constants.ERROR_FROM_LOCATION
+    to_error = constants.ERROR_TO_LOCATION
     from_station_code = get_station_code(from_location, from_error)
     if (from_station_code == from_error):
         return from_error
@@ -138,14 +138,12 @@ def command_path(*locations: list) -> str:
             get_station_name(code)
         )  # error message not necessart since impossible at this point
     path = ' -> '.join(path_with_names)
-    print(path)
     return path
 
 
 def get_station_code(location: str, error_message: str) -> str:
-    if (location in constants.STATION_CODES):
-        return constants.STATION_CODES[location]
-        # print("Location name: {} Code: {}".format(location, constants.STATION_CODES[location]))
+    if (location.lower() in constants.STATION_CODES):
+        return constants.STATION_CODES[location.lower()]
     else:
         return error_message
 
@@ -170,7 +168,6 @@ def make_wmata_request(endpoint: str) -> dict:
         return data
     except Exception as e:
         return {constants.ERROR_CONN: str(e)}
-        # print("[Errno {0}] {1}".format(e.errno, e.strerror))
 
 
 def connection_broken(data: dict) -> bool:
