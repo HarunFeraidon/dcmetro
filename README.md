@@ -3,6 +3,7 @@
 
 ## What is it
 With this application, you can submit concise commands via your terminal to request and then receive information.
+[PyPi page here](https://pypi.org/project/dcmetro/0.1.1/)
 
 ## Setup
 1. Setup a python virtual environment. `python3 -m venv venv`
