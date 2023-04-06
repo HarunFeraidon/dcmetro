@@ -1,5 +1,5 @@
 # DC Metro Command Line Tool
-[Imgur](https://i.imgur.com/rE4AKgU.gifv)
+![gif not found, check images/demo.gif](images/demo.gif)
 
 ## What is it
 With this application, you can submit concise commands via your terminal to request and then receive information.
