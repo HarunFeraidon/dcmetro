@@ -1,7 +1,7 @@
 import os
 import pickle
 import heapq
-from main.constants import EACH_LINES_DISTANCE_TO_PREVIOUS_STATION_LIST
+from .constants import EACH_LINES_DISTANCE_TO_PREVIOUS_STATION_LIST
 
 
 class GraphNode:

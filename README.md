@@ -1,8 +1,9 @@
 ## DC Metro Command Line Tool
-![alt text](images/demo.gif)
+[Imgur](https://i.imgur.com/rE4AKgU.gifv)
 
 # What is it
 With this application, you can submit concise commands via your terminal to request and then receive information.
+Run `dcmetro` to start.
 Useful commands include:
 - `when <location>` to view incoming trains.
 - `length <from_location> to <to_location>` to get an estimated length of rail time (not including stops, which will vary)
@@ -17,7 +18,7 @@ So, having the stations, in order, of a specific route color, and with distances
 *This was enough to complete a fully connected graph with weighted edges.*
 From here, Dijkstra's algorithm is utilized to find the shortest path between any two nodes in the graph.
 
-<img src="images/graph.png"  width="40%" height="40%">
+<img src="https://i.imgur.com/RQmR9qo.png"  width="40%" height="40%">
 
 Finally, the [Textual](https://textual.textualize.io) Python library is used for the terminal user interface.
 
