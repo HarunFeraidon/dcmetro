@@ -19,6 +19,12 @@ class InputRow(Static):
 
 
 class DcMetroApp(App):
+
+    @classmethod
+    def run_cli(cls):
+        app = cls()
+        app.run()
+    
     BINDINGS = [
         ("-", "clear", "Clear Here"),
     ]
@@ -59,8 +65,3 @@ class DcMetroApp(App):
             query.last().remove()
             query = self.query(".query")
         self.query_one("#results-container").mount(InputRow())
-
-
-if __name__ == "__main__":
-    app = DcMetroApp()
-    app.run()

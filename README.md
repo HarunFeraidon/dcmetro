@@ -1,8 +1,18 @@
-## DC Metro Command Line Tool
-![alt text](images/demo.gif)
+# DC Metro Command Line Tool
+[Imgur](https://i.imgur.com/rE4AKgU.gifv)
 
-# What is it
+## What is it
 With this application, you can submit concise commands via your terminal to request and then receive information.
+[PyPi page here](https://pypi.org/project/dcmetro/0.1.1/)
+
+## Setup
+1. Setup a python virtual environment. `python3 -m venv venv`
+2. Activate your python virtual environment. `source venv/bin/activate`
+3. Install with `pip install dcmetro`.
+4. Setup a WMATA API token [here](https://developer.wmata.com).
+5. Run `echo 'API_KEY = "<YOUR TOKEN HERE>"' > .env`
+6. Run `dcmetro` to start.
+
 Useful commands include:
 - `when <location>` to view incoming trains.
 - `length <from_location> to <to_location>` to get an estimated length of rail time (not including stops, which will vary)
@@ -17,7 +27,7 @@ So, having the stations, in order, of a specific route color, and with distances
 *This was enough to complete a fully connected graph with weighted edges.*
 From here, Dijkstra's algorithm is utilized to find the shortest path between any two nodes in the graph.
 
-<img src="images/graph.png"  width="40%" height="40%">
+<img src="https://i.imgur.com/RQmR9qo.png"  width="40%" height="40%">
 
 Finally, the [Textual](https://textual.textualize.io) Python library is used for the terminal user interface.
 
