@@ -1,17 +1,16 @@
 # DC Metro Command Line Tool
-![gif not found, check images/demo.gif](images/demo.gif)
+![Imgur](https://i.imgur.com/rE4AKgU.gif)
 
 ## What is it
 With this application, you can submit concise commands via your terminal to request and then receive information.
-[PyPi page here](https://pypi.org/project/dcmetro/0.1.1/)
+[PyPi page here](https://pypi.org/project/dcmetro/0.1.3/)
 
 ## Setup
 1. Setup a python virtual environment. `python3 -m venv venv`
 2. Activate your python virtual environment. `source venv/bin/activate`
 3. Install with `pip install dcmetro`.
-4. Setup a WMATA API token [here](https://developer.wmata.com).
-5. Run `echo 'API_KEY = "<YOUR TOKEN HERE>"' > .env`
-6. Run `dcmetro` to start.
+4. (OPTIONAL, BUT RECOMMENDED) Skipping this step means you will be using a community API key. Creating your own API token will be more reliable. Setup a WMATA API token [here](https://developer.wmata.com). Run `echo 'API_KEY = "<YOUR TOKEN HERE>"' > .env`
+5. Run `dcmetro` to start.
 
 Useful commands include:
 - `when <location>` to view incoming trains.

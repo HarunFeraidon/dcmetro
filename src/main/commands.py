@@ -7,7 +7,7 @@ from .build_graph import Graph, GraphNode
 import json
 
 load_dotenv(find_dotenv())
-API_KEY = os.environ.get("API_KEY")
+API_KEY = os.environ.get("API_KEY") if os.environ.get("API_KEY") else "e13626d03d8e4c03ac07f95541b3091b" # public community key
 headers = {
     # Request headers
     'api_key': API_KEY,

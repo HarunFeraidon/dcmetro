@@ -7,7 +7,7 @@ with open(os.path.join(os.path.dirname(__file__), "README.md"), "r") as f:
 setup(
     name='dcmetro',
     packages=find_packages(include=["src", "src.main"]),
-    version='0.1.1',
+    version='0.1.3',
     description='Console app for sending commands to get live information on the DC Metro',
     long_description=long_description,
     long_description_content_type="text/markdown",
