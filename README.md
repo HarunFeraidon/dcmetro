@@ -2,6 +2,8 @@
 ![Imgur](https://i.imgur.com/rE4AKgU.gif)
 
 ## What is it
+[![PyPI version](https://badge.fury.io/py/dcmetro.svg)](https://badge.fury.io/py/dcmetro)
+
 A command line app for sending commands to get live information on the DC Metro. You can find the shortest path between two stations, an estimation of the rail time between two stations, and the current arrival times for your metro station.
 [PyPi page here](https://pypi.org/project/dcmetro/0.1.3/)
 
